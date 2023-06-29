@@ -59,19 +59,11 @@ df_sorted['Proportion of WOSB Funds Obligated to Ineligible NAICS Codes'] = df_s
 # Get the top 15 states
 top_15_states = df_sorted[['Entity State', 'Prop Ineligible']].head(15).reset_index(drop=True)
 
-chart = alt.Chart(top_15_states).mark_bar().encode(
-    y=alt.Y('Entity State', sort='-x'),  # Sort states in descending order
+chart = alt.Chart(top_15_states).mark_bar().encode(y=alt.Y('Entity State', sort='-x'),
     x='Prop Ineligible',
-    tooltip=['Entity State', 'Prop Ineligible']
-).properties(
-    width=600,
+    tooltip=['Entity State', 'Prop Ineligible']).properties(width=600,
     height=400,
-    title='Top 15 States or Territories by Proportion of WOSB Funds Obligated to Ineligible NAICS Codes'
-).configure_axisX(
-    labelAngle=0  # Set x-axis labels orientation to horizontal
-)
-
-# Render the chart using Streamlit
+    title='Top 15 States or Territories by Proportion of WOSB Funds Obligated to Ineligible NAICS Codes').configure_axisX(labelAngle=0)
 st.altair_chart(chart, use_container_width=True)
 
 
