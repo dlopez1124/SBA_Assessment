@@ -8,9 +8,6 @@
 
 import pandas as pd
 import streamlit as st
-import altair as alt
-import branca.colormap as cm
-import streamlit_folium
 import warnings
 warnings.filterwarnings('ignore')
 
