@@ -7,8 +7,6 @@
 
 
 import pandas as pd
-import geopandas as gpd
-import folium
 import streamlit as st
 import altair as alt
 import branca.colormap as cm
@@ -19,18 +17,15 @@ warnings.filterwarnings('ignore')
 
 
 
-state_gdf = gpd.read_file('cb_2022_us_state_500k/cb_2022_us_state_500k.shp')
-
-state_gdf = state_gdf.rename(columns={'NAME': 'Entity State'})
-
-state_gdf = state_gdf[['Entity State', 'geometry']]
 
 wosb_by_state = pd.read_csv('Data/wosb_by_state.csv')
 
-wosb_gdf = state_gdf.merge(wosb_by_state, how='left', on='Entity State')
-wosb_gdf = wosb_gdf.dropna()
+wosb_gdf = wosb_by_state
 
-wosb_gdf = wosb_gdf.sort_values(by='Entity State').reset_index(drop=True)
+#wosb_gdf = state_gdf.merge(wosb_by_state, how='left', on='Entity State')
+#wosb_gdf = wosb_gdf.dropna()
+
+#wosb_gdf = wosb_gdf.sort_values(by='Entity State').reset_index(drop=True)
 
 wosb_gdf['Total WOSB Action Obligation'] = wosb_gdf['Total WOSB Action Obligation'].apply(lambda x: '${:,.2f}'.format(x))
 wosb_gdf['EDWOSB Action Obligation'] = wosb_gdf['EDWOSB Action Obligation'].apply(lambda x: '${:,.2f}'.format(x))
@@ -39,10 +34,10 @@ wosb_gdf['Eligible NAICS Action Obligation'] = wosb_gdf['Eligible NAICS Action O
 
 
 
-s = gpd.GeoSeries(wosb_gdf['geometry'])
+#s = gpd.GeoSeries(wosb_gdf['geometry'])
 
-x_map = s.centroid.x.mean()
-y_map = s.centroid.y.mean()
+#x_map = s.centroid.x.mean()
+#y_map = s.centroid.y.mean()
 
 pd.options.display.float_format = '{:.2f}'.format
 
@@ -52,59 +47,6 @@ st.caption('Source: GSA Federal Procurement Data System, Contracts with WOSB Set
 
 
 
-@st.cache(allow_output_mutation=True)
-def choropleth_map(wosb_gdf):
-    mymap = folium.Map(location=[y_map, x_map], zoom_start=4,tiles=None)
-    folium.TileLayer('CartoDB positron',name="Light Map",control=False).add_to(mymap)
-    folium.Choropleth(geo_data=wosb_gdf,
-                      data=wosb_gdf,
-                      columns=['Entity State',"Prop Ineligible"],
-                      key_on="feature.properties.Entity State",
-                      fill_color='YlGnBu',
-                      fill_opacity=1,
-                      line_opacity=1,
-                      legend_name="Proportion of WOSB Funds Obligated to Ineligible NAICS Codes",
-                      smooth_factor=0,
-                      #Highlight= True,
-                      name = "Proportion Ineligible NAICS",
-                      #show=False,
-                      #overlay=True,
-                      nan_fill_color = "White").add_to(mymap)
-    
-    style_function = lambda x: {'fillColor': '#ffffff', 
-                            'color':'#000000', 
-                            'fillOpacity': .1, 
-                            'weight': 1}
-    
-    highlight_function = lambda x: {'fillColor': '#0000000', 
-                               'color':'#000000', 
-                                'fillOpacity': 0.1, 
-                                'weight': 1}
-    
-    hover = folium.features.GeoJson(
-        wosb_gdf,
-        style_function=style_function,
-        control=False,
-        highlight_function=highlight_function,
-        tooltip=folium.features.GeoJsonTooltip(
-            fields=['Entity State',
-                'Eligible NAICS Action Obligation',
-                'EDWOSB Action Obligation',
-               'Ineligible NAICS Action Obligation'],
-        aliases=['State: ',
-		 'Obligated to WOSB Eligible NAICS Code: ',
-                 'Obligated to EDWOSB Eligible NAICS Code: ',
-                 'Obligated to WOSB Ineligible NAICS Code: '],
-       style=("background-color: white; color: #333333; font-family: arial; font-size: 12px; padding: 10px;") 
-    )
-)
-    mymap.add_child(hover)
-    mymap.keep_in_front(hover)
-    folium.LayerControl().add_to(mymap)
-    
-    return mymap
-
-streamlit_folium.folium_static(choropleth_map(wosb_gdf))
 
 
 
