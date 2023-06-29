@@ -45,9 +45,12 @@ st.title('SBA WOSB Analysis')
 st.subheader('By: David Lopez Jr.')
 st.caption('Source: GSA Federal Procurement Data System, Contracts with WOSB Set-Asides, 04/01/2011 to 06/27/2023')
 
+st.markdown('---')
 
 
+st.markdown('##### Please use the following hyperlink to view the [WOSB Analysis Choropleth Map](https://dlopez1124.github.io/SBA_Assessment/). Thank you.', unsafe_allow_html=True)
 
+st.markdown('')
 
 
 df_sorted = wosb_by_state.sort_values('Prop Ineligible', ascending=False)
@@ -127,4 +130,8 @@ selected_state = st.selectbox('Select State', states)
 
 # Call the display_state_info function with the selected state
 display_state_info(selected_state)
+
+st.markdown('---')
+
+st.markdown('Link to [GitHub Repository](https://github.com/dlopez1124/SBA_Assessment)')
 
